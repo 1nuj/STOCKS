@@ -1,0 +1,207 @@
+/* Default Theme Variables */
+:root {
+    --primary-bg: #f4f4f4;
+    --container-bg: white;
+    --text-color: #333;
+    --button-bg: #007BFF;
+    --button-hover-bg: #0056b3;
+    --drop-border: #007BFF;
+    --progress-bar-bg: #007BFF;
+}
+
+/* Ocean Theme */
+.ocean {
+    --primary-bg: #b8e2f4;
+    --container-bg: #eaf6fa;
+    --text-color: #235284;
+    --button-bg: #3271a5;
+    --button-hover-bg: #235284;
+    --drop-border: #46a2da;
+    --progress-bar-bg: #58afdd;
+}
+
+/* Pro Trader Theme */
+.pro-trader {
+    --primary-bg: #1a1a1a;
+    --container-bg: #333;
+    --text-color: #fff;
+    --button-bg: #0f0;
+    --button-hover-bg: #0d0;
+    --drop-border: #f00;
+    --progress-bar-bg: #0f0;
+}
+
+/* Sand Theme */
+.sand {
+    --primary-bg: #d6cecc;
+    --container-bg: #f0e8e5;
+    --text-color: #454549;
+    --button-bg: #ba8778;
+    --button-hover-bg: #8b5e57;
+    --drop-border: #ddbdb0;
+    --progress-bar-bg: #ba8778;
+}
+
+/* Forest Theme */
+.forest {
+    --primary-bg: #B9C384;
+    --container-bg: #9EAE6F;
+    --text-color: #4F6F5A;
+    --button-bg: #AAAO4E;
+    --button-hover-bg: #819967;
+    --drop-border: #868850;
+    --progress-bar-bg: #4F6F5A;
+}
+
+/* Stone Theme */
+.stone {
+    --primary-bg: #646464;
+    --container-bg: #e4e4e4;
+    --text-color: #383838;
+    --button-bg: #7b7b7b;
+    --button-hover-bg: #6c6c6c;
+    --drop-border: #9b9c9c;
+    --progress-bar-bg: #949494;
+}
+
+/* Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--primary-bg);
+    text-align: center;
+    padding: 20px;
+    transition: background-color 0.3s;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    margin-bottom: 20px;
+}
+
+.theme-toggle select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--drop-border);
+}
+
+/* Container Styles */
+.container {
+    background: var(--container-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: auto;
+    transition: background-color 0.3s;
+}
+
+h1 {
+    color: var(--text-color);
+}
+
+/* Drag & Drop Styles */
+.drop-area {
+    border: 2px dashed var(--drop-border);
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.drop-area.drag-over {
+    background-color: #e3f2fd;
+}
+
+/* Analyze Button */
+.analyze-btn {
+    background-color: var(--button-bg);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.analyze-btn:hover {
+    background-color: var(--button-hover-bg);
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 20px;
+    height: 10px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 10px;
+    background-color: var(--progress-bar-bg);
+    transition: width 0.3s ease-in-out;
+}
+
+/* Result Card */
+.result-card {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background: #f8f9fa;
+    transition: transform 0.3s ease-in-out, opacity 0.3s;
+}
+
+.result-card.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.result-card.slide-in {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Final Decision Styles */
+.final-decision {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.buy-text {
+    color: green;
+    background-color: #d4edda;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.sell-text {
+    color: red;
+    background-color: #f8d7da;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Confidence Text */
+.confidence-text {
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+/* Uploaded Image */
+.uploaded-image {
+    display: none;
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+    max-height: 300px; /* Optional to constrain the height */
+    object-fit: contain; /* Keeps the aspect ratio */
+}
