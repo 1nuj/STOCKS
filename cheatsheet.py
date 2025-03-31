@@ -1,10 +1,7 @@
-
-
 import torch
 from torchvision import models, transforms
 from PIL import Image
 import numpy as np
-from huggingface_hub import hf_hub_download
 
 
 buy_sell_mapping = {
@@ -34,4 +31,3 @@ def extract_features_resnet(model, image_path):
     feature_vector = features.numpy().flatten()
     print("Extracted Feature Shape:", feature_vector.shape) 
     return feature_vector
-

@@ -3,18 +3,52 @@ import os
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from cheatsheet import load_resnet, extract_features_resnet, buy_sell_mapping
+import uuid
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
+limiter = Limiter(get_remote_address, app=app, default_limits=["10 per minute"])
+
 
 resnet_model = load_resnet()
-
 
 root_dir = "./cheatsheet"
 database_images = list(buy_sell_mapping.keys())
 database_paths = [os.path.join(root_dir, img) for img in database_images]
 
+image_name_map = {
+    "AT.jpg": "Ascending Triangle",
+    "BB.jpg": "Broadening Bottom",
+    "BT.jpg": "Broadening Top",
+    "CAH.jpg": "Cup and Handle",
+    "DBW.jpg": "Double Bottom",
+    "DT.jpg": "Descending Triangle",
+    "DTM.jpg": "Double Top",
+    "FF.jpg": "Falling Flag",
+    "FP.jpg": "Falling Pennant",
+    "FW.jpg": "Falling Wedge",
+    "HAS.jpg": "Head and Shoulder",
+    "ICAH.jpg": "Inverse Cup and Handle",
+    "IHAS.jpg": "Inverse Head and Shoulder",
+    "RB.jpg": "Rounding Bottom",
+    "RF.jpg": "Rising Flag",
+    "RP.jpg": "Rising Pennant",
+    "RT.jpg": "Rounding Top",
+    "RW.jpg": "Rising Wedge",
+    "TB.jpg": "Triple Bottom",
+    "TT.jpg": "Triple Top"
+}
+
+
 database_features_resnet = np.array([extract_features_resnet(resnet_model, img) for img in database_paths])
+
+def delete_old_images():
+    for file in os.listdir("uploads"):
+        file_path = os.path.join("uploads", file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
 @app.route("/")
 def index():
@@ -25,13 +59,16 @@ def serve_static(path):
     return send_from_directory("static", path)
 
 @app.route("/analyze", methods=["POST"])
+@limiter.limit("10 per minute") 
 def analyze():
     try:
+        delete_old_images()
+
         if "image" not in request.files:
             return jsonify({"error": "No image uploaded"}), 400
 
         image = request.files["image"]
-        image_path = "uploaded_image.jpg"
+        image_path = f"uploads/{uuid.uuid4().hex}.jpg"
         image.save(image_path)
 
 
@@ -45,13 +82,16 @@ def analyze():
         closest_resnet_idx = np.argmax(similarities_resnet)
         resnet_match = database_images[closest_resnet_idx]
         confidence_resnet = float(similarities_resnet[0, closest_resnet_idx] * 100)
+        closest_image_name = image_name_map.get(resnet_match, "Unknown Image")
+
 
         resnet_decision = buy_sell_mapping[resnet_match]
 
         return jsonify({
             "resnet_match": resnet_match,
             "resnet_confidence": confidence_resnet,
-            "resnet_decision": resnet_decision
+            "resnet_decision": resnet_decision,
+            "resnet_imagename": closest_image_name
         })
     
     except Exception as e:

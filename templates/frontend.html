@@ -18,23 +18,17 @@
             <option value="stone">🪨 Stone</option>
         </select>
     </div>
-
     <div class="container">
         <h1>Stock Pattern Analyzer</h1>
 
-        <!-- Drag & Drop Area -->
         <div id="drop-area" class="drop-area">
             <p id="drop-text">Drag & Drop a stock trend image or <label for="imageInput" class="file-label">browse</label></p>
             <input type="file" id="imageInput" title="Upload an image to analyze" />
-            <img id="previewImage" class="preview-image" style="display: none;" />
+            <img id="uploadedImage" class="uploaded-image" alt="Uploaded stock trend image" />
         </div>
 
-        <!-- Uploaded Image Preview -->
-        <img id="uploadedImage" class="uploaded-image" alt="Uploaded stock trend image" />
-
         <button onclick="analyzeImage()" class="analyze-btn">Analyze</button>
-
-        <!-- Progress Bar -->
+        
         <div id="progress-container" class="progress-container hidden">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
@@ -43,6 +37,19 @@
             <h3>Analysis Result:</h3>
             <p id="finalDecision" class="final-decision"></p>
             <p id="confidence" class="confidence-text"></p>
+            <p id="closestImageName" class="closest-image-name"></p>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div class="suggested-box">
+            <p><strong>Suggested Time Frame:</strong> 4 hours</p>
+            <p><strong>Suggested Ratio:</strong> 1.6:1</p>
+            <p><strong>Success Rate:</strong> 85%</p>
+        </div>
+
+        <div class="disclaimer-box">
+            <p><strong>Disclaimer:</strong> This analysis is for informational purposes only and should not be considered as financial advice.</p>
         </div>
     </div>
 
@@ -52,7 +59,6 @@
             changeTheme(savedTheme);
             document.getElementById("themeSelect").value = savedTheme;
 
-            // Add change event to image input for preview
             document.getElementById("imageInput").addEventListener("change", handleImagePreview);
         });
 
@@ -62,10 +68,9 @@
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    // Show the uploaded image in the preview area
                     const previewImage = document.getElementById("uploadedImage");
                     previewImage.src = e.target.result;
-                    previewImage.style.display = "block"; // Show the image
+                    previewImage.style.display = "block";
                 }
 
                 reader.readAsDataURL(file);
@@ -77,6 +82,11 @@
             localStorage.setItem("selectedTheme", theme);
         }
 
+        function updateProgress(progress) {
+            const progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = progress + "%";
+        }
+
         function analyzeImage() {
             const input = document.getElementById("imageInput").files[0];
             if (!input) {
@@ -84,12 +94,10 @@
                 return;
             }
 
-            // Show progress bar and hide the uploaded image (if any)
             document.getElementById("progress-container").classList.remove("hidden");
-            document.getElementById("uploadedImage").style.display = "none"; // Hide image during analysis
+            document.getElementById("uploadedImage").style.display = "none";
             updateProgress(0);
 
-            // Simulate progress and analysis
             let progress = 0;
             let interval = setInterval(() => {
                 progress += 20;
@@ -99,30 +107,44 @@
                 }
                 updateProgress(progress);
             }, 300);
-        }
 
-        function updateProgress(progress) {
-            const progressBar = document.getElementById("progress-bar");
-            progressBar.style.width = progress + "%";
-        }
+            const formData = new FormData();
+            formData.append("image", input);
 
+            fetch("/analyze", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                let finalText = "";
+                if (data.resnet_decision === "buy") {
+                    finalText = "Final Decision: BUY";
+                    document.getElementById("finalDecision").className = "final-decision buy-text";
+                } else if (data.resnet_decision === "sell") {
+                    finalText = "Final Decision: SELL";
+                    document.getElementById("finalDecision").className = "final-decision sell-text";
+                }
+
+                document.getElementById("finalDecision").innerText = finalText;
+                document.getElementById("confidence").innerText = `Confidence: ${Math.round(data.resnet_confidence)}%`; 
+
+                document.getElementById("closestImageName").innerText = `${data.resnet_imagename}`;
+
+                const imgURL = URL.createObjectURL(input);
+                document.getElementById("uploadedImage").src = imgURL;
+                document.getElementById("uploadedImage").style.display = "block";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while processing the image.' });
+            });
+        }
+        
         function showResults() {
-            document.getElementById("progress-container").classList.add("hidden");
-
-            // Fake results for demo
-            const randomDecision = Math.random() > 0.5 ? "BUY" : "SELL";
-            const confidence = (Math.random() * 100).toFixed(2);
-
-            let finalText = randomDecision === "BUY" ? "Final Decision: LONG" : "Final Decision: SHORT";
-            let finalClass = randomDecision === "BUY" ? "buy-text" : "sell-text";
-
-            document.getElementById("finalDecision").innerText = finalText;
-            document.getElementById("finalDecision").className = "final-decision " + finalClass;
-            document.getElementById("confidence").innerText = `Confidence: ${confidence}%`;
-
             document.getElementById("result-container").classList.remove("hidden");
-            document.getElementById("result-container").classList.add("slide-in");
         }
+
     </script>
 </body>
 </html>
